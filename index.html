@@ -1,0 +1,641 @@
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  Home, BookOpen, TestTube, User, RotateCcw, Check, X,
+  ArrowLeft, ArrowRight, Trophy, TrendingUp, Calendar
+} from "lucide-react";
+
+/** ========= קבועים ========= */
+const APP_NAME = "שופי נהג מלווה";
+const DATA_URL = "/data/theory_questions.json"; // שים כאן את הקובץ שסיפקתי לך
+
+/** ========= עזרי RTL =========
+ * המאגר כבר מנורמל, אבל נשאיר מייצב קצר אם בעתיד תטען תכנים נוספים.
+ */
+function normalizeHeb(s) { return typeof s === "string" ? s.trim() : s; }
+
+/** ========= יוטיליטי ========= */
+const nowHour = () => new Date().getHours();
+function greeting() {
+  const h = nowHour();
+  if (h < 12) return "בוקר טוב! קדימה לרישיון?";
+  if (h < 17) return "אחר הצהריים זה הזמן המושלם לתרגול!";
+  return "נסיים את היום עם כמה שאלות?";
+}
+
+function classNames(...arr) {
+  return arr.filter(Boolean).join(" ");
+}
+
+/** ========= טעינת נתונים ========= */
+function useQuestions() {
+  const [raw, setRaw] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState(null);
+
+  useEffect(() => {
+    let ok = true;
+    (async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(DATA_URL, { cache: "no-store" });
+        if (!res.ok) throw new Error("נכשל בטעינת המאגר");
+        const data = await res.json();
+        if (ok) setRaw(data || []);
+      } catch (e) {
+        setErr(e.message || String(e));
+      } finally {
+        if (ok) setLoading(false);
+      }
+    })();
+    return () => { ok = false; };
+  }, []);
+
+  // מפה מינימלית ויציבה
+  const questions = useMemo(() => (raw || []).map(q => ({
+    id: q.id || null,
+    question: normalizeHeb(q.question),
+    category: normalizeHeb(q.category || "כללי"),
+    imageUrl: q.imageUrl || null,
+    choices: (q.choices || []).map(c => ({ id: c.id, text: normalizeHeb(c.text) })),
+    correctIndex: typeof q.correct_index === "number" ? q.correct_index : null,
+  })), [raw]);
+
+  return { questions, loading, err };
+}
+
+/** ========= הפקת קטגוריות ========= */
+function useCategories(questions) {
+  return useMemo(() => {
+    const map = new Map();
+    for (const q of questions) {
+      const k = q.category || "כללי";
+      map.set(k, (map.get(k) || 0) + 1);
+    }
+    const list = Array.from(map.entries())
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, count]) => ({ name, count }));
+    return [{ name: "הכול", count: questions.length }, ...list];
+  }, [questions]);
+}
+
+/** ========= בחירת שאלות ========= */
+function pickRandom(arr, n) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a.slice(0, n);
+}
+
+/** ========= קומפוננטה ראשית ========= */
+export default function ShofiApp() {
+  const { questions, loading, err } = useQuestions();
+  const categories = useCategories(questions);
+
+  // ניווט
+  const [screen, setScreen] = useState("welcome"); // welcome -> category -> home -> daily/exam/flash/profile
+  const [playerName, setPlayerName] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("הכול");
+
+  // סטים
+  const [dailySet, setDailySet] = useState([]);
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [locked, setLocked] = useState(false);
+  const [correctTally, setCorrectTally] = useState(0);
+
+  // נקודות ומדדים קלים
+  const [userProgress, setUserProgress] = useState({
+    totalAnswered: 0,
+    answeredCorrect: 0,
+    streak: 1,
+    level: 1,
+    points: 0,
+    weeklyGoal: 80,
+    weeklyCompleted: 0
+  });
+
+  // כשיש נתונים ואישרנו שם, עוברים לקטגוריות
+  useEffect(() => {
+    if (screen === "welcome" && !loading && !err) {
+      // נשארים במסך קבלת שם
+    }
+  }, [screen, loading, err]);
+
+  // מסך קבלת שם
+  if (screen === "welcome") {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6 flex flex-col items-center justify-center" dir="rtl">
+        <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md border border-gray-100">
+          <div className="text-5xl mb-4 text-center">🦉</div>
+          <h1 className="text-3xl font-bold text-purple-600 text-center mb-2">{APP_NAME}</h1>
+          <p className="text-gray-600 text-center mb-6">הדרך שלך לרישיון עוברת כאן 🎯</p>
+
+          <label htmlFor="name" className="block text-sm text-gray-700 mb-1">איך קוראים לך?</label>
+          <input
+            id="name"
+            className="w-full border-2 border-gray-200 rounded-xl p-3 text-right focus:border-purple-500 outline-none mb-4"
+            placeholder="שם פרטי"
+            value={playerName}
+            onChange={e => setPlayerName(e.target.value)}
+          />
+
+          <button
+            onClick={() => playerName.trim() && setScreen("category")}
+            className={classNames(
+              "w-full rounded-2xl py-3 font-semibold transition-all",
+              playerName.trim()
+                ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:scale-[1.02]"
+                : "bg-gray-100 text-gray-400 cursor-not-allowed"
+            )}
+          >
+            נצא לדרך
+          </button>
+
+          <p className="text-xs text-gray-400 text-center mt-6">
+            © 2025 yaroni studio - תוכן חזק, עובד חכם ומבוסס על בינה · <span dir="ltr">hello@yaronistudio.com</span>
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // מסך בחירת קטגוריה
+  if (screen === "category") {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6" dir="rtl">
+        <div className="flex items-center justify-between mb-6">
+          <button onClick={() => setScreen("welcome")} className="w-10 h-10 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center">
+            <ArrowRight className="w-5 h-5 text-gray-600" />
+          </button>
+          <h2 className="font-semibold text-gray-800">שלום {playerName}! בחרו נושא ללמידה</h2>
+          <div className="w-10" />
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 max-w-xl mx-auto">
+          {categories.map(({ name, count }) => (
+            <button
+              key={name}
+              onClick={() => setSelectedCategory(name)}
+              className={classNames(
+                "p-4 rounded-2xl border transition-all text-right",
+                selectedCategory === name
+                  ? "bg-blue-50 border-blue-200 text-blue-700 shadow-sm"
+                  : "bg-white border-gray-100 hover:bg-gray-50"
+              )}
+            >
+              <div className="text-base font-medium">{name}</div>
+              <div className="text-xs text-gray-500">{count} שאלות</div>
+            </button>
+          ))}
+        </div>
+
+        <div className="max-w-xl mx-auto mt-6 flex gap-3">
+          <button
+            onClick={() => setScreen("home")}
+            className="flex-1 rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-500 text-white py-3 font-semibold hover:scale-[1.01] transition-all"
+          >
+            להמשיך לרישיון
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // סינון לפי קטגוריה
+  const filtered = useMemo(() => {
+    if (selectedCategory === "הכול") return questions;
+    return questions.filter(q => q.category === selectedCategory);
+  }, [questions, selectedCategory]);
+
+  // יצירת סט יומי (5)
+  useEffect(() => {
+    if (screen === "home" && filtered.length > 0) {
+      setDailySet(pickRandom(filtered, Math.min(5, filtered.length)));
+      setCurrentIdx(0);
+      setSelected(null);
+      setLocked(false);
+      setCorrectTally(0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screen, selectedCategory, filtered.length]);
+
+  /** ====== מסך בית ====== */
+  const acc = userProgress.totalAnswered > 0
+    ? Math.round((userProgress.answeredCorrect / userProgress.totalAnswered) * 100)
+    : 0;
+
+  if (screen === "home") {
+    return (
+      <div className="p-6 bg-gray-50 min-h-screen" dir="rtl">
+        {/* Header */}
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-3xl p-8 mb-8 border border-blue-100/50">
+          <div className="flex justify-between items-start mb-6">
+            <div className="flex-1">
+              <h1 className="text-2xl sm:text-3xl font-light text-gray-800 mb-2">{APP_NAME}</h1>
+              <p className="text-gray-600 text-lg font-light">{greeting()}</p>
+            </div>
+            <div className="bg-white/70 rounded-2xl px-6 py-4 text-center border border-white/50">
+              <div className="text-2xl font-medium text-gray-800">רמה {userProgress.level}</div>
+              <div className="text-sm text-gray-600 mt-1">{userProgress.points} נקודות</div>
+            </div>
+          </div>
+
+          {/* Progress */}
+          <div className="bg-white/60 rounded-2xl p-6 border border-white/50">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="font-medium text-gray-800">
+                עוד {Math.max(0, userProgress.weeklyGoal - userProgress.weeklyCompleted)} שאלות עד ליעד השבועי! 💪
+              </h3>
+              <span className="text-sm text-gray-500 bg-gray-100/70 px-3 py-1 rounded-full">
+                {userProgress.weeklyCompleted}/{userProgress.weeklyGoal}
+              </span>
+            </div>
+            <div className="w-full bg-gray-200/50 rounded-full h-2">
+              <div
+                className="bg-gradient-to-r from-blue-400 to-indigo-500 h-2 rounded-full transition-all"
+                style={{ width: `${(userProgress.weeklyCompleted / Math.max(1, userProgress.weeklyGoal)) * 100}%` }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="bg-green-50 p-6 rounded-2xl border border-green-100/50">
+            <div className="flex items-center mb-3">
+              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-green-600" />
+              </div>
+              <span className="text-sm text-green-700 font-medium mr-3">דיוק מצטבר</span>
+            </div>
+            <div className="text-3xl font-light text-green-800">{acc}%</div>
+            <div className="text-xs text-green-600 mt-1">הרישיון מתקרב</div>
+          </div>
+
+          <div className="bg-orange-50 p-6 rounded-2xl border border-orange-100/50">
+            <div className="flex items-center mb-3">
+              <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
+                <Trophy className="w-5 h-5 text-orange-600" />
+              </div>
+              <span className="text-sm text-orange-700 font-medium mr-3">רצף ימים</span>
+            </div>
+            <div className="text-3xl font-light text-orange-800">{userProgress.streak}</div>
+            <div className="text-xs text-orange-600 mt-1">אתה בדרך הנכונה</div>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="space-y-4">
+          <button
+            onClick={() => setScreen("daily")}
+            className="w-full bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md hover:scale-[1.02] transition-all"
+          >
+            <div className="flex items-center">
+              <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                <Calendar className="w-6 h-6 text-blue-600" />
+              </div>
+              <div className="text-right mr-4">
+                <div className="font-medium text-gray-800">נצא לדרך</div>
+                <div className="text-sm text-gray-500">5 שאלות מותאמות אישית • {selectedCategory}</div>
+              </div>
+            </div>
+            <ArrowLeft className="w-5 h-5 text-gray-400" />
+          </button>
+
+          <button
+            onClick={() => setScreen("exam")}
+            className="w-full bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md hover:scale-[1.02] transition-all"
+          >
+            <div className="flex items-center">
+              <div className="w-12 h-12 bg-yellow-50 rounded-xl flex items-center justify-center">
+                <TestTube className="w-6 h-6 text-yellow-600" />
+              </div>
+              <div className="text-right mr-4">
+                <div className="font-medium text-gray-800">נתניע!</div>
+                <div className="text-sm text-gray-500">מבחן זמן אמת • 30 שאלות</div>
+              </div>
+            </div>
+            <ArrowLeft className="w-5 h-5 text-gray-400" />
+          </button>
+
+          <button
+            onClick={() => setScreen("flash")}
+            className="w-full bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md hover:scale-[1.02] transition-all"
+          >
+            <div className="flex items-center">
+              <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
+                <RotateCcw className="w-6 h-6 text-purple-600" />
+              </div>
+              <div className="text-right mr-4">
+                <div className="font-medium text-gray-800">לתרגל עכשיו</div>
+                <div className="text-sm text-gray-500">כרטיסיות תמרורים</div>
+              </div>
+            </div>
+            <ArrowLeft className="w-5 h-5 text-gray-400" />
+          </button>
+        </div>
+
+        {/* Footer */}
+        <div className="text-center py-8 text-xs text-gray-400">
+          <div>{APP_NAME} • כל כביש מתחיל כאן 🛣️</div>
+          <div className="mt-2">© 2025 yaroni studio - תוכן חזק, עובד חכם ומבוסס על בינה · <span dir="ltr">hello@yaronistudio.com</span></div>
+        </div>
+      </div>
+    );
+  }
+
+  /** ====== מסך תרגול יומי ====== */
+  if (screen === "daily") {
+    const q = dailySet[currentIdx];
+    const total = dailySet.length;
+    if (!q) {
+      return (
+        <div className="p-6 min-h-screen bg-gray-50" dir="rtl">
+          <div className="max-w-md mx-auto bg-white rounded-2xl p-6 border">
+            אין מספיק שאלות בקטגוריה שנבחרה. נסו קטגוריה אחרת או בחרו "הכול".
+            <div className="mt-4">
+              <button onClick={() => setScreen("home")} className="rounded-xl bg-blue-600 text-white px-4 py-2">חזרה</button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    const onChoose = (idx) => {
+      if (locked) return;
+      setSelected(idx);
+    };
+
+    const onConfirm = () => {
+      if (locked || selected == null) return;
+      setLocked(true);
+      const isRight = q.correctIndex != null && selected === q.correctIndex;
+      setUserProgress(p => ({
+        ...p,
+        totalAnswered: p.totalAnswered + 1,
+        answeredCorrect: p.answeredCorrect + (isRight ? 1 : 0),
+        points: p.points + (isRight ? 10 : 0),
+        weeklyCompleted: p.weeklyCompleted + 1
+      }));
+      if (isRight) setCorrectTally(x => x + 1);
+      setTimeout(() => {
+        // לשאלה הבאה
+        setSelected(null);
+        setLocked(false);
+        if (currentIdx < total - 1) setCurrentIdx(i => i + 1);
+        else setScreen("home");
+      }, 700);
+    };
+
+    return (
+      <div className="p-6 bg-gray-50 min-h-screen" dir="rtl">
+        <div className="flex items-center justify-between mb-6">
+          <button onClick={() => setScreen("home")} className="w-10 h-10 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center">
+            <ArrowRight className="w-5 h-5 text-gray-600" />
+          </button>
+          <div className="text-center">
+            <h2 className="font-medium text-gray-800">בואו נתקדם</h2>
+            <p className="text-sm text-gray-500">שאלה {currentIdx + 1} מתוך {total}</p>
+          </div>
+          <div className="w-10" />
+        </div>
+
+        {/* פס התקדמות */}
+        <div className="w-full bg-gray-200 rounded-full h-1 mb-6">
+          <div
+            className="bg-gradient-to-r from-blue-400 to-indigo-500 h-1 rounded-full transition-all"
+            style={{ width: `${((currentIdx + 1) / Math.max(1, total)) * 100}%` }}
+          />
+        </div>
+
+        {/* השאלה */}
+        <div className="bg-white rounded-3xl p-6 mb-6 shadow-sm border">
+          <div className="text-xl font-medium text-gray-800 leading-relaxed">{q.question}</div>
+          {q.imageUrl && (
+            <div className="mt-4">
+              <img src={q.imageUrl} alt="" className="w-full rounded-xl border" />
+            </div>
+          )}
+        </div>
+
+        {/* אופציות - גמיש במספר */}
+        <div className="space-y-3 mb-6">
+          {(q.choices || []).map((opt, idx) => {
+            const isCorrect = q.correctIndex != null && idx === q.correctIndex;
+            const isWrongPick = selected === idx && selected !== q.correctIndex;
+            return (
+              <button
+                key={opt.id || idx}
+                onClick={() => onChoose(idx)}
+                disabled={locked}
+                className={classNames(
+                  "w-full p-5 rounded-2xl text-right transition-all border",
+                  locked
+                    ? isCorrect
+                      ? "bg-green-50 text-green-800 border-green-200"
+                      : isWrongPick
+                        ? "bg-red-50 text-red-800 border-red-200"
+                        : "bg-gray-50 text-gray-500 border-gray-100"
+                    : selected === idx
+                      ? "bg-blue-50 text-blue-800 border-blue-200"
+                      : "bg-white text-gray-800 hover:bg-gray-50 border-gray-100"
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">{opt.text}</span>
+                  {locked && isCorrect && <Check className="w-5 h-5 text-green-600" />}
+                  {locked && isWrongPick && <X className="w-5 h-5 text-red-600" />}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        <button
+          onClick={onConfirm}
+          disabled={locked || selected == null}
+          className={classNames(
+            "w-full p-5 rounded-2xl font-medium transition-all",
+            locked || selected == null
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-blue-500 text-white hover:bg-blue-600"
+          )}
+        >
+          {currentIdx < total - 1 ? "עוד שאלה" : "לחגוג את ההצלחה"}
+        </button>
+      </div>
+    );
+  }
+
+  /** ====== מסך מבחן מדומה ====== */
+  if (screen === "exam") {
+    const examSet = useMemo(() => pickRandom(filtered, Math.min(30, filtered.length)), [filtered]);
+    return (
+      <div className="p-6 bg-gray-50 min-h-screen" dir="rtl">
+        <div className="flex items-center justify-between mb-8">
+          <button onClick={() => setScreen("home")} className="w-10 h-10 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center">
+            <ArrowRight className="w-5 h-5 text-gray-600" />
+          </button>
+          <h2 className="font-medium text-gray-800">מבחן זמן אמת - 30 שאלות שיבדקו אותך</h2>
+          <div className="w-10" />
+        </div>
+
+        <div className="bg-gradient-to-br from-yellow-50 to-amber-100 rounded-3xl p-8 mb-8 border border-yellow-100/50">
+          <h3 className="text-2xl font-light text-gray-800 mb-4">מבחן רשמי (ניסיון) - הכל בידיים שלך</h3>
+          <p className="text-gray-600 mb-6 leading-relaxed">
+            מוכן? נראה מה למדת! 🚀
+          </p>
+          <button
+            onClick={() => { setDailySet(examSet); setCurrentIdx(0); setScreen("daily"); }}
+            className="bg-white text-yellow-600 px-8 py-4 rounded-2xl font-medium hover:bg-gray-50 transition-all border border-yellow-100"
+          >
+            נתניע!
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  /** ====== כרטיסיות תמרורים מתוך המאגר ====== */
+  if (screen === "flash") {
+    const signCards = useMemo(
+      () => filtered.filter(q => q.imageUrl).slice(0, 20),
+      [filtered]
+    );
+    const [idx, setIdx] = useState(0);
+    const [remembered, setRemembered] = useState(() => new Set());
+    const card = signCards[idx];
+
+    if (signCards.length === 0) {
+      return (
+        <div className="p-6 min-h-screen bg-gray-50" dir="rtl">
+          <div className="max-w-md mx-auto bg-white rounded-2xl p-6 border">
+            לא נמצאו תמרורים בקטגוריה הזאת. נסו לבחור קטגוריה אחרת או "הכול".
+            <div className="mt-4">
+              <button onClick={() => setScreen("home")} className="rounded-xl bg-blue-600 text-white px-4 py-2">חזרה</button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    const mark = (ok) => {
+      const next = idx < signCards.length - 1 ? idx + 1 : 0;
+      setIdx(next);
+      setRemembered(prev => {
+        const s = new Set(prev);
+        if (ok) s.add(card.id || `${idx}`);
+        else s.delete(card.id || `${idx}`);
+        return s;
+      });
+    };
+
+    return (
+      <div className="p-6 bg-gray-50 min-h-screen" dir="rtl">
+        <div className="flex items-center justify-between mb-6">
+          <button onClick={() => setScreen("home")} className="w-10 h-10 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center">
+            <ArrowRight className="w-5 h-5 text-gray-600" />
+          </button>
+          <div className="text-center">
+            <h2 className="font-medium text-gray-800">איזה תמרור זה? בואו נבדוק יחד</h2>
+            <p className="text-sm text-gray-500">כרטיסיה {idx + 1} מתוך {signCards.length}</p>
+          </div>
+          <div className="w-10" />
+        </div>
+
+        <div className="bg-white rounded-3xl p-8 mb-6 text-center shadow-sm border min-h-72 flex flex-col justify-center">
+          {card?.imageUrl && <img src={card.imageUrl} alt="" className="mx-auto w-40 h-40 object-contain mb-4" />}
+          <div className="text-lg text-gray-700">{card?.question}</div>
+        </div>
+
+        <div className="flex gap-3">
+          <button onClick={() => mark(false)} className="flex-1 bg-red-50 text-red-600 p-4 rounded-2xl font-medium border border-red-100">לא זוכר</button>
+          <button onClick={() => mark(true)} className="flex-1 bg-green-50 text-green-600 p-4 rounded-2xl font-medium border border-green-100">זוכר</button>
+        </div>
+
+        <div className="bg-white rounded-2xl p-6 shadow-sm border mt-6">
+          <div className="grid grid-cols-2 text-center">
+            <div>
+              <div className="text-2xl font-light text-green-600">{remembered.size}</div>
+              <div className="text-sm text-gray-600">תמרורים שזכרת</div>
+            </div>
+            <div>
+              <div className="text-2xl font-light text-red-600">{signCards.length - remembered.size}</div>
+              <div className="text-sm text-gray-600">תמרורים שכחת</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /** ====== פרופיל קצר ====== */
+  if (screen === "profile") {
+    return (
+      <div className="p-6 bg-gray-50 min-h-screen" dir="rtl">
+        <div className="flex items-center justify-between mb-6">
+          <button onClick={() => setScreen("home")} className="w-10 h-10 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center">
+            <ArrowRight className="w-5 h-5 text-gray-600" />
+          </button>
+          <h2 className="font-medium text-gray-800">האזור האישי</h2>
+          <div className="w-10" />
+        </div>
+
+        <div className="bg-white rounded-3xl p-8 border">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 rounded-2xl bg-gray-100 mx-auto flex items-center justify-center text-3xl">👤</div>
+            <div className="mt-2 text-gray-700">שלום {playerName}</div>
+            <div className="text-sm text-gray-500">רמה {userProgress.level} • {userProgress.points} נקודות</div>
+          </div>
+          <div className="grid grid-cols-3 gap-3 text-center">
+            <div className="p-3 rounded-xl bg-yellow-50 border border-yellow-100">
+              <div className="text-xl">🏆</div>
+              <div className="text-xs mt-1">רצף {userProgress.streak} ימים</div>
+            </div>
+            <div className="p-3 rounded-xl bg-green-50 border border-green-100">
+              <div className="text-xl">🎯</div>
+              <div className="text-xs mt-1">דיוק {acc}%</div>
+            </div>
+            <div className="p-3 rounded-xl bg-blue-50 border border-blue-100 opacity-70">
+              <div className="text-xl">⭐</div>
+              <div className="text-xs mt-1">מבחן מושלם - בדרך</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /** ====== ניווט תחתון ====== */
+  const Bottom = (
+    <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-gray-100 px-6 py-3">
+      <div className="flex justify-around max-w-md mx-auto">
+        <button onClick={() => setScreen("home")} className="flex flex-col items-center text-gray-600">
+          <Home className="w-6 h-6" /><span className="text-xs">בית</span>
+        </button>
+        <button onClick={() => setScreen("daily")} className="flex flex-col items-center text-gray-600">
+          <BookOpen className="w-6 h-6" /><span className="text-xs">למידה</span>
+        </button>
+        <button onClick={() => setScreen("exam")} className="flex flex-col items-center text-gray-600">
+          <TestTube className="w-6 h-6" /><span className="text-xs">מבחנים</span>
+        </button>
+        <button onClick={() => setScreen("flash")} className="flex flex-col items-center text-gray-600">
+          <RotateCcw className="w-6 h-6" /><span className="text-xs">תמרורים</span>
+        </button>
+        <button onClick={() => setScreen("profile")} className="flex flex-col items-center text-gray-600">
+          <User className="w-6 h-6" /><span className="text-xs">פרופיל</span>
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* אם נופלים לפה, נטען הביתה ברירת מחדל */}
+      {setScreen("home")}
+      {Bottom}
+    </div>
+  );
+}

@@ -3,49 +3,120 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>תיאוריה GO – אתר לימוד</title>
+  <title>תיאוריה GO – אתר לימוד (עיצוב מחודש)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
+          fontFamily: {
+            sans: ['Assistant','system-ui','-apple-system','Segoe UI','Roboto','Noto Sans Hebrew','Helvetica','Arial','sans-serif']
+          },
           colors: {
             brand: {
-              blue: '#1C4E80',
-              yellow: '#F8D90F'
+              purple: '#8B5FBF',
+              purpleDark: '#6A4C93',
+              indigo: '#7B68EE',
+              blue: '#1C4E80', // לשמירה על אחורה תואם
+              gold: '#FFD700',
+              orange: '#FFA500'
             }
           },
-          fontFamily: {
-            sans: [
-              'system-ui','-apple-system','Segoe UI','Roboto','Noto Sans Hebrew','Helvetica','Arial','sans-serif'
-            ]
+          boxShadow: {
+            glass: '0 20px 60px rgba(0,0,0,0.15)',
+          },
+          borderRadius: {
+            '2xl': '1.25rem'
+          },
+          keyframes: {
+            fadeInUp: {
+              '0%': { opacity: 0, transform: 'translateY(30px)' },
+              '100%': { opacity: 1, transform: 'translateY(0)' }
+            },
+            floaty: {
+              '0%, 100%': { transform: 'translateY(0)'},
+              '50%': { transform: 'translateY(-6px)'}
+            }
+          },
+          animation: {
+            'fade-in-up': 'fadeInUp 0.6s ease-out both',
+            'floaty': 'floaty 4s ease-in-out infinite'
           }
         }
       }
     }
   </script>
   <style>
-    /* פוקוס נגיש */
-    :focus-visible { outline: 3px solid #1C4E80; outline-offset: 2px; }
+    /* מצב פוקוס נגיש */
+    :focus-visible { outline: 3px solid #8B5FBF; outline-offset: 2px; }
+
+    /* מחלקות עיצוביות בסגנון "AI Twin" */
+    .hero-gradient { background: linear-gradient(135deg, #8B5FBF 0%, #6A4C93 50%, #7B68EE 100%); }
+    .glass { background: rgba(255,255,255,0.15); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.2); }
+    .btn-gradient-gold { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #333; }
+    .btn-gradient-blue { background: linear-gradient(135deg, #4299E1 0%, #3182CE 100%); color: #fff; }
+    .section-soft { background: linear-gradient(135deg, #F7FAFC 0%, #EDF2F7 100%); }
+    .section-soft-green { background: linear-gradient(135deg, #E6F7E6 0%, #F0FFF0 100%); }
+    .section-soft-purple { background: linear-gradient(135deg, #E6F3FF 0%, #F0F8FF 100%); }
+
+    /* ריוול-און-סק롤 */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.in-view { opacity: 1; transform: translateY(0); }
+
+    /* אנימציית רוחב בר-תקדמות */
+    #study-progress { transition: width .35s ease; }
+
+    /* הפחתת תנועה לפי העדפת משתמש */
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { transition: none; transform: none; }
+      .animate-fade-in-up, .animate-floaty { animation: none !important; }
+      #study-progress { transition: none; }
+    }
   </style>
 </head>
 <body class="min-h-screen bg-slate-50 font-sans text-slate-900">
-  <!-- Header -->
-  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-200">
+  <!-- Hero מעל הכל -->
+  <section class="hero-gradient min-h-[70vh] md:min-h-[78vh] relative flex items-center justify-center text-center px-4 pt-24 pb-16">
+    <!-- נגיעות דקורטיביות -->
+    <div class="absolute inset-0 pointer-events-none opacity-20">
+      <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/20 blur-2xl animate-floaty"></div>
+      <div class="absolute bottom-10 left-10 w-52 h-52 rounded-full bg-white/10 blur-3xl animate-floaty" style="animation-delay:.8s"></div>
+    </div>
+
+    <div class="relative z-10 max-w-5xl space-y-6">
+      <div class="inline-block glass text-white text-sm md:text-base px-4 py-2 rounded-full shadow-glass reveal">לימוד תיאוריה חכם. תוצאות שמרגישות קמפיין.</div>
+      <h1 class="text-5xl md:text-7xl font-bold leading-tight text-white drop-shadow reveal">תיאוריה&nbsp;GO</h1>
+      <p class="glass text-white/90 px-6 py-4 md:px-10 md:py-6 rounded-2xl mx-auto max-w-2xl reveal">
+        מסלול למידה מדורג, מבחן מדומה בזמן אמת, תמרורים בכרטיסיות, וסטטיסטיקות התקדמות. הכל בממשק מודרני עם אנימציות עדינות.
+      </p>
+      <div class="flex flex-wrap items-center justify-center gap-3 md:gap-4 reveal">
+        <button id="hero-start-study" class="btn-gradient-gold px-6 py-3 rounded-full font-bold shadow-lg hover:translate-y-[-2px] active:translate-y-[0] transition">התחל/י למידה יומית</button>
+        <button id="hero-start-exam" class="btn-gradient-blue px-6 py-3 rounded-full font-bold shadow-lg hover:translate-y-[-2px] active:translate-y-[0] transition">מבחן מדומה 30 שאלות</button>
+      </div>
+      <div class="text-white/90 reveal">
+        <div class="text-xl">★★★★★</div>
+        <div class="font-semibold">4.9/5 ע"פ אלפי תרגולים</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Header דביק וזכוכיתי -->
+  <header class="sticky top-0 z-40 bg-white/70 backdrop-blur border-b border-white/30 shadow-sm">
     <div class="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
-      <div class="h-9 w-9 grid place-items-center rounded-2xl bg-brand-blue text-white text-lg">🚗</div>
-      <div class="text-xl font-bold">תיאוריה GO</div>
+      <div class="h-10 w-10 grid place-items-center rounded-2xl text-white text-lg shadow-glass" style="background: linear-gradient(135deg, #8B5FBF 0%, #6A4C93 50%, #7B68EE 100%);">🚗</div>
+      <div class="text-xl font-bold text-slate-800">תיאוריה GO</div>
       <div class="ms-auto flex items-center gap-2">
-        <button id="btn-theme" class="px-3 py-1.5 text-sm rounded-xl border border-slate-300 hover:bg-slate-100" title="החלפת מצב תצוגה">מצב בהיר</button>
+        <button id="btn-theme" class="px-3 py-1.5 text-sm rounded-xl border border-slate-300 bg-white/70 hover:bg-white transition" title="החלפת מצב תצוגה">מצב בהיר</button>
       </div>
     </div>
     <nav class="max-w-5xl mx-auto px-4 pb-3">
       <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
-        <button data-view="home" class="tab-btn px-3 py-2 rounded-2xl bg-brand-blue text-white">בית</button>
-        <button data-view="study" class="tab-btn px-3 py-2 rounded-2xl bg-white border border-slate-200">למידה</button>
-        <button data-view="exam" class="tab-btn px-3 py-2 rounded-2xl bg-white border border-slate-200">מבחן מדומה</button>
-        <button data-view="signs" class="tab-btn px-3 py-2 rounded-2xl bg-white border border-slate-200">תמרורים</button>
-        <button data-view="profile" class="tab-btn px-3 py-2 rounded-2xl bg-white border border-slate-200">פרופיל</button>
+        <button data-view="home" class="tab-btn px-3 py-2 rounded-2xl bg-slate-900 text-white shadow hover:translate-y-[-1px] transition">בית</button>
+        <button data-view="study" class="tab-btn px-3 py-2 rounded-2xl bg-white/80 border border-slate-200 hover:bg-white transition">למידה</button>
+        <button data-view="exam" class="tab-btn px-3 py-2 rounded-2xl bg-white/80 border border-slate-200 hover:bg-white transition">מבחן מדומה</button>
+        <button data-view="signs" class="tab-btn px-3 py-2 rounded-2xl bg-white/80 border border-slate-200 hover:bg-white transition">תמרורים</button>
+        <button data-view="profile" class="tab-btn px-3 py-2 rounded-2xl bg-white/80 border border-slate-200 hover:bg-white transition">פרופיל</button>
       </div>
     </nav>
   </header>
@@ -53,18 +124,18 @@
   <!-- Toast -->
   <div id="toast" class="fixed top-3 left-3 sm:left-auto sm:right-3 z-50 hidden"></div>
 
-  <main class="max-w-5xl mx-auto px-4 py-6 space-y-6">
+  <main class="max-w-5xl mx-auto px-4 py-10 space-y-10">
     <!-- HOME -->
     <section id="view-home" class="view grid md:grid-cols-2 gap-4">
-      <div class="p-5 bg-white rounded-2xl shadow">
+      <div class="p-5 rounded-2xl shadow bg-white/90 border border-slate-200 reveal">
         <h2 class="text-lg font-semibold mb-1">ברוך/ה הבא/ה 👋</h2>
-        <p class="text-slate-600 mb-4">בוא/י נתחיל במסלול קצר להצלחה במבחן התיאוריה. אפשר להתחיל בלמידה יומית או לקפוץ ישר לסימולציה.</p>
+        <p class="text-slate-600 mb-4">הצטרף/פי למסלול חכם להצלחה במבחן התיאוריה. אפשר להתחיל בלמידה יומית או לקפוץ ישר לסימולציה.</p>
         <div class="flex flex-wrap gap-2">
-          <button id="cta-start-daily" class="px-4 py-2 rounded-2xl bg-brand-blue text-white">התחל/י למידה יומית</button>
-          <button id="cta-start-exam" class="px-4 py-2 rounded-2xl bg-brand-yellow">התחל/י מבחן מדומה</button>
+          <button id="cta-start-daily" class="px-4 py-2 rounded-2xl text-white shadow" style="background: linear-gradient(135deg, #8B5FBF 0%, #6A4C93 50%, #7B68EE 100%);">התחל/י למידה יומית</button>
+          <button id="cta-start-exam" class="px-4 py-2 rounded-2xl btn-gradient-gold">התחל/י מבחן מדומה</button>
         </div>
       </div>
-      <div class="p-5 bg-white rounded-2xl shadow">
+      <div class="p-5 rounded-2xl shadow bg-white/90 border border-slate-200 reveal">
         <h3 class="font-semibold mb-2">התקדמות</h3>
         <div class="flex items-end gap-6">
           <div>
@@ -81,15 +152,21 @@
           </div>
         </div>
       </div>
+
+      <!-- קופסת CTA בגרדיאנט עדין -->
+      <div class="md:col-span-2 rounded-2xl p-6 shadow section-soft-purple border border-slate-200 reveal">
+        <h3 class="text-slate-800 text-xl font-bold mb-2">לומדים חכם, מרגישים קמפיין</h3>
+        <p class="text-slate-600">כרטיסיות תמרורים, מבחן מדומה עם טיימר, וסטט׳ בזמן אמת. הכל בממשק רך, זמין, ונעים לעין.</p>
+      </div>
     </section>
 
     <!-- STUDY -->
     <section id="view-study" class="view hidden">
-      <div class="p-5 bg-white rounded-2xl shadow">
+      <div class="p-5 rounded-2xl shadow bg-white/90 border border-slate-200 reveal">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-semibold">למידה יומית – 5 שאלות</h2>
           <div class="w-40 h-2 rounded-full bg-slate-200 overflow-hidden">
-            <div id="study-progress" class="h-full bg-brand-blue" style="width:0%"></div>
+            <div id="study-progress" class="h-full" style="background: linear-gradient(135deg, #8B5FBF 0%, #6A4C93 50%, #7B68EE 100%); width:0%"></div>
           </div>
         </div>
         <div id="study-card" class="space-y-3"></div>
@@ -98,12 +175,12 @@
 
     <!-- EXAM -->
     <section id="view-exam" class="view hidden">
-      <div class="p-5 bg-white rounded-2xl shadow space-y-4">
+      <div class="p-5 rounded-2xl shadow bg-white/90 border border-slate-200 space-y-4 reveal">
         <div class="flex items-center justify-between">
           <h2 class="text-lg font-semibold">מבחן מדומה</h2>
           <div class="flex items-center gap-3">
             <div class="text-slate-600">⏱️ זמן נותר: <span id="exam-timer">—</span></div>
-            <button id="btn-start-exam" class="px-3 py-1.5 rounded-xl bg-brand-blue text-white">התחל מבחן (30 שאלות)</button>
+            <button id="btn-start-exam" class="px-3 py-1.5 rounded-xl text-white shadow" style="background: linear-gradient(135deg, #4299E1 0%, #3182CE 100%);">התחל מבחן (30 שאלות)</button>
           </div>
         </div>
         <div id="exam-area" class="hidden">
@@ -115,7 +192,7 @@
             <button id="exam-next" class="px-3 py-1.5 rounded-xl border">הבא</button>
           </div>
           <div class="flex items-center gap-2 mt-3">
-            <button id="exam-submit" class="px-4 py-2 rounded-2xl bg-brand-yellow">סיים מבחן</button>
+            <button id="exam-submit" class="px-4 py-2 rounded-2xl btn-gradient-gold">סיים מבחן</button>
             <button id="exam-cancel" class="px-3 py-1.5 rounded-xl border">ביטול</button>
           </div>
         </div>
@@ -125,10 +202,10 @@
 
     <!-- SIGNS -->
     <section id="view-signs" class="view hidden">
-      <div class="p-5 bg-white rounded-2xl shadow">
+      <div class="p-5 rounded-2xl shadow bg-white/90 border border-slate-200 reveal">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-semibold">כרטיסיות תמרורים</h2>
-          <div class="text-sm text-slate-600">סמן/י אם זכור לך, נלמד שוב את הלא-זכורים</div>
+          <div class="text-sm text-slate-600">סמן/י אם זכור, נלמד שוב את הלא‑זכורים</div>
         </div>
         <div id="sign-card" class="space-y-3"></div>
       </div>
@@ -136,7 +213,7 @@
 
     <!-- PROFILE -->
     <section id="view-profile" class="view hidden">
-      <div class="p-5 bg-white rounded-2xl shadow space-y-4">
+      <div class="p-5 rounded-2xl shadow bg-white/90 border border-slate-200 space-y-4 reveal">
         <h2 class="text-lg font-semibold">פרופיל והתקדמות</h2>
         <div class="grid sm:grid-cols-3 gap-4">
           <div class="p-4 rounded-2xl border bg-slate-50">
@@ -160,7 +237,7 @@
     </section>
   </main>
 
-  <footer class="max-w-5xl mx-auto px-4 pb-10 text-center text-slate-500 text-sm">
+  <footer class="max-w-5xl mx-auto px-4 pb-10 text-center text-slate-500 text-sm reveal">
     נבנה כקובץ יחיד לצורך MVP • תיאוריה GO ©
   </footer>
 
@@ -227,11 +304,11 @@
       document.getElementById('view-'+view).classList.remove('hidden');
       document.querySelectorAll('.tab-btn').forEach(btn=>{
         if(btn.dataset.view===view){
-          btn.classList.remove('bg-white','border','border-slate-200');
-          btn.classList.add('bg-brand-blue','text-white');
+          btn.classList.remove('bg-white/80','border','border-slate-200');
+          btn.classList.add('bg-slate-900','text-white');
         } else {
-          btn.classList.add('bg-white','border','border-slate-200');
-          btn.classList.remove('bg-brand-blue','text-white');
+          btn.classList.add('bg-white/80','border','border-slate-200');
+          btn.classList.remove('bg-slate-900','text-white');
         }
       });
       refreshDashboard();
@@ -241,7 +318,7 @@
     // ====== טוסטר ======
     function toast(msg){
       const el = document.getElementById('toast');
-      el.innerHTML = `<div class="px-4 py-2 rounded-xl shadow bg-brand-blue text-white">${msg}</div>`;
+      el.innerHTML = `<div class="px-4 py-2 rounded-xl shadow text-slate-900 bg-gradient-to-r from-yellow-300 to-amber-400">${msg}</div>`;
       el.classList.remove('hidden');
       setTimeout(()=> el.classList.add('hidden'), 1800);
     }
@@ -254,15 +331,22 @@
     }
     function refreshDashboard(){
       const acc = accuracyPercent();
-      document.getElementById('stat-correct-rate').textContent = acc + '%';
-      document.getElementById('stat-answered').textContent = state.stats.totalAnswered;
-      document.getElementById('stat-streak').textContent = (state.stats.streak||0) + '🔥';
-      document.getElementById('pf-accuracy').textContent = acc + '%';
-      document.getElementById('pf-answered').textContent = state.stats.totalAnswered;
-      document.getElementById('pf-streak').textContent = (state.stats.streak||0) + '🔥';
+      const el1 = document.getElementById('stat-correct-rate');
+      if(el1) el1.textContent = acc + '%';
+      const el2 = document.getElementById('stat-answered');
+      if(el2) el2.textContent = state.stats.totalAnswered;
+      const el3 = document.getElementById('stat-streak');
+      if(el3) el3.textContent = (state.stats.streak||0) + '🔥';
+      const el4 = document.getElementById('pf-accuracy');
+      if(el4) el4.textContent = acc + '%';
+      const el5 = document.getElementById('pf-answered');
+      if(el5) el5.textContent = state.stats.totalAnswered;
+      const el6 = document.getElementById('pf-streak');
+      if(el6) el6.textContent = (state.stats.streak||0) + '🔥';
 
       // topic stats
       const wrap = document.getElementById('topic-stats');
+      if(!wrap) return;
       wrap.innerHTML = '';
       const topics = state.stats.topics || {};
       const names = Object.keys(topics);
@@ -273,7 +357,7 @@
         const row = document.createElement('div');
         row.className = 'flex items-center gap-3';
         row.innerHTML = `<div class="w-28 text-sm text-slate-600">${name}</div>
-          <div class="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden"><div class="h-full bg-brand-blue" style="width:${pct}%"></div></div>
+          <div class="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden"><div class="h-full" style="background: linear-gradient(135deg, #8B5FBF 0%, #6A4C93 50%, #7B68EE 100%); width:${pct}%"></div></div>
           <div class="w-10 text-end text-sm">${pct}%</div>`;
         wrap.appendChild(row);
       });
@@ -291,7 +375,7 @@
     // ====== למידה יומית ======
     function startDailyStudy(){
       state.study.currentIndex = 0;
-      // דגום 5 שאלות שונות
+      // דגימה של 5 שאלות שונות
       const pool = [...QUESTIONS];
       const picked = [];
       while(picked.length < Math.min(5, pool.length)){
@@ -305,31 +389,35 @@
     }
     function updateStudyProgress(){
       const pct = Math.round((state.study.currentIndex/state.study.queue.length)*100);
-      document.getElementById('study-progress').style.width = pct + '%';
+      const bar = document.getElementById('study-progress');
+      if(bar) bar.style.width = pct + '%';
     }
     function renderStudyCard(){
       const box = document.getElementById('study-card');
+      if(!box) return;
       box.innerHTML = '';
       const i = state.study.currentIndex;
       if(i >= state.study.queue.length){
-        box.innerHTML = `<div class="text-center space-y-2">
+        box.innerHTML = `<div class="text-center space-y-3">
           <div class="text-xl font-semibold">כל הכבוד! סיימת את הלמידה היומית 🎉</div>
-          <button class="px-4 py-2 rounded-2xl bg-brand-yellow" onclick="navigate('home')">חזרה לבית</button>
+          <button class="px-4 py-2 rounded-2xl btn-gradient-gold" onclick="navigate('home')">חזרה לבית</button>
         </div>`;
-        document.getElementById('study-progress').style.width = '100%';
+        const bar = document.getElementById('study-progress');
+        if(bar) bar.style.width = '100%';
         return;
       }
       const q = state.study.queue[i];
       const qEl = document.createElement('div');
-      qEl.innerHTML = `<div class="text-slate-600 text-sm mb-1">נושא: ${q.topic}</div>
-        <div class="text-lg font-medium">${q.q}</div>`;
+      qEl.className = 'reveal in-view';
+      qEl.innerHTML = `<div class=\"text-slate-600 text-sm mb-1\">נושא: ${q.topic}</div>
+        <div class=\"text-lg font-medium\">${q.q}</div>`;
       box.appendChild(qEl);
 
       const opts = document.createElement('div');
       opts.className = 'mt-3 grid gap-2';
       q.options.forEach((txt,idx)=>{
         const b = document.createElement('button');
-        b.className = 'px-3 py-2 rounded-xl border text-right hover:bg-slate-50';
+        b.className = 'px-3 py-2 rounded-xl border text-right hover:bg-slate-50 transition';
         b.textContent = txt;
         b.onclick = ()=>{
           const isCorrect = idx === q.correct;
@@ -342,7 +430,7 @@
           exp.className = 'text-sm text-slate-600';
           exp.textContent = isCorrect ? 'נכון! ממשיכים לשאלה הבאה.' : 'לא נורא, נשפר בשאלה הבאה.';
           box.appendChild(exp);
-          setTimeout(()=>{ state.study.currentIndex++; updateStudyProgress(); renderStudyCard(); }, 600);
+          setTimeout(()=>{ state.study.currentIndex++; updateStudyProgress(); renderStudyCard(); }, 650);
         };
         opts.appendChild(b);
       });
@@ -354,7 +442,7 @@
       state.exam.running = true;
       state.exam.index = 0;
       state.exam.answers = {};
-      // בחר 30 אקראיות (אם אין מספיק – ניתן חזרות בטוחות)
+      // בחר 30 אקראיות (אם אין מספיק – חזרות בטוחות)
       const arr = [];
       for(let i=0;i<30;i++){
         arr.push( QUESTIONS[Math.floor(Math.random()*QUESTIONS.length)] );
@@ -387,7 +475,7 @@
       opts.innerHTML = '';
       q.options.forEach((txt,idx)=>{
         const lbl = document.createElement('label');
-        lbl.className = 'flex items-center gap-2 p-2 rounded-xl border hover:bg-slate-50 cursor-pointer';
+        lbl.className = 'flex items-center gap-2 p-2 rounded-xl border hover:bg-slate-50 cursor-pointer transition';
         const inp = document.createElement('input');
         inp.type = 'radio';
         inp.name = 'exam-opt';
@@ -419,7 +507,7 @@
       box.innerHTML = `<div class="p-4 rounded-2xl border ${pass?'bg-green-50':'bg-red-50'}">
         <div class="text-lg font-semibold mb-1">תוצאה: ${correct}/${total} (${percent}%)</div>
         <div class="text-slate-700 mb-3">${pass? 'מעולה! נראה שאתה/את בכיוון הנכון ✅' : 'יש עוד מה לשפר – ממליץ/ה לעבוד על נקודות החולשה.'}</div>
-        <button class="px-4 py-2 rounded-2xl bg-brand-blue text-white" onclick="startExam()">נסה/י שוב</button>
+        <button class="px-4 py-2 rounded-2xl text-white shadow" style="background: linear-gradient(135deg, #8B5FBF 0%, #6A4C93 50%, #7B68EE 100%);" onclick="startExam()">נסה/י שוב</button>
       </div>`;
       refreshDashboard();
       toast('המבחן הסתיים – התוצאה נשמרה');
@@ -442,13 +530,13 @@
         } else {
           box.innerHTML = `<div class="text-center space-y-2">
             <div class="text-xl font-semibold">יפה! שלטתם בתמרורים שבסט זה 🎉</div>
-            <button class="px-4 py-2 rounded-2xl bg-brand-blue text-white" onclick="startSigns()">סיבוב נוסף</button>
+            <button class="px-4 py-2 rounded-2xl text-white shadow" style=\"background: linear-gradient(135deg, #4299E1 0%, #3182CE 100%);\" onclick=\"startSigns()\">סיבוב נוסף</button>
           </div>`; return;
         }
       }
       const s = flash.order[flash.index];
       const card = document.createElement('div');
-      card.className = 'p-4 rounded-2xl border bg-slate-50';
+      card.className = 'p-4 rounded-2xl border bg-slate-50 reveal in-view';
       card.innerHTML = `<div class="text-4xl mb-2">🚧</div>
         <div class="text-lg font-semibold">${s.name}</div>
         <div class="text-slate-700">${s.desc}</div>`;
@@ -456,7 +544,7 @@
       const actions = document.createElement('div');
       actions.className = 'flex gap-2 mt-3';
       const known = document.createElement('button'); known.className = 'px-3 py-1.5 rounded-xl border'; known.textContent = 'זכור לי';
-      const unknown = document.createElement('button'); unknown.className = 'px-3 py-1.5 rounded-xl bg-brand-yellow rounded-xl'; unknown.textContent = 'לא זכור';
+      const unknown = document.createElement('button'); unknown.className = 'px-3 py-1.5 rounded-xl btn-gradient-gold'; unknown.textContent = 'לא זכור';
       known.onclick = ()=>{ flash.index++; renderSignCard(); };
       unknown.onclick = ()=>{ flash.queue.push(s); flash.index++; renderSignCard(); };
       actions.appendChild(known); actions.appendChild(unknown); box.appendChild(actions);
@@ -472,8 +560,21 @@
       themeBtn.textContent = dark? 'מצב כהה' : 'מצב בהיר';
     }
 
+    // ====== ריוול-און-סק롤 ======
+    function setupReveal(){
+      const observer = new IntersectionObserver((entries)=>{
+        entries.forEach(e=>{
+          if(e.isIntersecting){ e.target.classList.add('in-view'); observer.unobserve(e.target); }
+        })
+      }, { threshold: 0.12 });
+      document.querySelectorAll('.reveal').forEach(el=> observer.observe(el));
+    }
+
     // ====== חיבור אירועים ======
     function wire(){
+      // כפתורי הירו
+      const hs = document.getElementById('hero-start-study'); if(hs) hs.addEventListener('click', ()=>{ navigate('study'); toast('טוב, מתחילים בלמידה יומית!'); });
+      const he = document.getElementById('hero-start-exam'); if(he) he.addEventListener('click', ()=>{ navigate('exam'); startExam(); });
       // טאבים
       document.querySelectorAll('.tab-btn').forEach(b=> b.addEventListener('click', ()=> navigate(b.dataset.view)));
       document.getElementById('cta-start-daily').addEventListener('click', ()=>{ navigate('study'); toast('טוב, מתחילים בלמידה יומית!'); });
@@ -491,6 +592,7 @@
     function init(){
       applyTheme();
       wire();
+      setupReveal();
       navigate('home');
     }
 

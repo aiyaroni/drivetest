@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>תיאוריה GO – אתר לימוד (עיצוב מחודש)</title>
+  <title>תיאוריה GO – אתר לימוד (UX ממוקד ומינימליסטי)</title>
   <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -15,32 +15,31 @@
           },
           colors: {
             brand: {
-              purple: '#8B5FBF',
-              purpleDark: '#6A4C93',
-              indigo: '#7B68EE',
-              blue: '#1C4E80', // לשמירה על אחורה תואם
+              primary: '#6A4C93',
+              primaryLight: '#8B5FBF',
+              primaryIndigo: '#7B68EE',
+              action: '#2563EB',
               gold: '#FFD700',
-              orange: '#FFA500'
+              amber: '#F59E0B',
+              success: '#16A34A',
+              error: '#DC2626'
             }
           },
           boxShadow: {
-            glass: '0 20px 60px rgba(0,0,0,0.15)',
-          },
-          borderRadius: {
-            '2xl': '1.25rem'
+            card: '0 10px 30px rgba(0,0,0,0.08)',
           },
           keyframes: {
             fadeInUp: {
-              '0%': { opacity: 0, transform: 'translateY(30px)' },
+              '0%': { opacity: 0, transform: 'translateY(18px)' },
               '100%': { opacity: 1, transform: 'translateY(0)' }
             },
             floaty: {
-              '0%, 100%': { transform: 'translateY(0)'},
-              '50%': { transform: 'translateY(-6px)'}
+              '0%,100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-6px)' }
             }
           },
           animation: {
-            'fade-in-up': 'fadeInUp 0.6s ease-out both',
+            'fade-in-up': 'fadeInUp 220ms ease-out both',
             'floaty': 'floaty 4s ease-in-out infinite'
           }
         }
@@ -48,94 +47,77 @@
     }
   </script>
   <style>
-    /* מצב פוקוס נגיש */
-    :focus-visible { outline: 3px solid #8B5FBF; outline-offset: 2px; }
-
-    /* מחלקות עיצוביות בסגנון "AI Twin" */
+    :focus-visible { outline: 3px solid #6A4C93; outline-offset: 2px; }
     .hero-gradient { background: linear-gradient(135deg, #8B5FBF 0%, #6A4C93 50%, #7B68EE 100%); }
-    .glass { background: rgba(255,255,255,0.15); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.2); }
-    .btn-gradient-gold { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #333; }
-    .btn-gradient-blue { background: linear-gradient(135deg, #4299E1 0%, #3182CE 100%); color: #fff; }
+    .btn-primary { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #333; }
+    .btn-secondary { background: linear-gradient(135deg, #4299E1 0%, #3182CE 100%); color: #fff; }
     .section-soft { background: linear-gradient(135deg, #F7FAFC 0%, #EDF2F7 100%); }
-    .section-soft-green { background: linear-gradient(135deg, #E6F7E6 0%, #F0FFF0 100%); }
-    .section-soft-purple { background: linear-gradient(135deg, #E6F3FF 0%, #F0F8FF 100%); }
+    /* מצב פוקוס: מסתיר פיתוחים וניווט ללמידה מלאה */
+    body.focus-mode header, body.focus-mode footer { display: none; }
+    body.focus-mode .container { max-width: 68rem; }
 
     /* ריוול-און-סק롤 */
-    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal { opacity: 0; transform: translateY(18px); transition: opacity .22s ease, transform .22s ease; }
     .reveal.in-view { opacity: 1; transform: translateY(0); }
 
-    /* אנימציית רוחב בר-תקדמות */
-    #study-progress { transition: width .35s ease; }
-
-    /* הפחתת תנועה לפי העדפת משתמש */
     @media (prefers-reduced-motion: reduce) {
       .reveal { transition: none; transform: none; }
-      .animate-fade-in-up, .animate-floaty { animation: none !important; }
-      #study-progress { transition: none; }
+      [class*="animate-"] { animation: none !important; }
     }
   </style>
 </head>
 <body class="min-h-screen bg-slate-50 font-sans text-slate-900">
-  <!-- Hero מעל הכל -->
-  <section class="hero-gradient min-h-[70vh] md:min-h-[78vh] relative flex items-center justify-center text-center px-4 pt-24 pb-16">
-    <!-- נגיעות דקורטיביות -->
-    <div class="absolute inset-0 pointer-events-none opacity-20">
-      <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/20 blur-2xl animate-floaty"></div>
+  <!-- Hero -->
+  <section class="hero-gradient min-h-[64vh] md:min-h-[72vh] relative flex items-center justify-center text-center px-4 pt-24 pb-16">
+    <div class="absolute inset-0 pointer-events-none opacity-15">
+      <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/25 blur-2xl animate-floaty"></div>
       <div class="absolute bottom-10 left-10 w-52 h-52 rounded-full bg-white/10 blur-3xl animate-floaty" style="animation-delay:.8s"></div>
     </div>
-
-    <div class="relative z-10 max-w-5xl space-y-6">
-      <div class="inline-block glass text-white text-sm md:text-base px-4 py-2 rounded-full shadow-glass reveal">לימוד תיאוריה חכם. תוצאות שמרגישות קמפיין.</div>
-      <h1 class="text-5xl md:text-7xl font-bold leading-tight text-white drop-shadow reveal">תיאוריה&nbsp;GO</h1>
-      <p class="glass text-white/90 px-6 py-4 md:px-10 md:py-6 rounded-2xl mx-auto max-w-2xl reveal">
-        מסלול למידה מדורג, מבחן מדומה בזמן אמת, תמרורים בכרטיסיות, וסטטיסטיקות התקדמות. הכל בממשק מודרני עם אנימציות עדינות.
-      </p>
-      <div class="flex flex-wrap items-center justify-center gap-3 md:gap-4 reveal">
-        <button id="hero-start-study" class="btn-gradient-gold px-6 py-3 rounded-full font-bold shadow-lg hover:translate-y-[-2px] active:translate-y-[0] transition">התחל/י למידה יומית</button>
-        <button id="hero-start-exam" class="btn-gradient-blue px-6 py-3 rounded-full font-bold shadow-lg hover:translate-y-[-2px] active:translate-y-[0] transition">מבחן מדומה 30 שאלות</button>
-      </div>
-      <div class="text-white/90 reveal">
-        <div class="text-xl">★★★★★</div>
-        <div class="font-semibold">4.9/5 ע"פ אלפי תרגולים</div>
+    <div class="relative z-10 max-w-3xl space-y-6">
+      <h1 class="text-5xl md:text-7xl font-bold leading-tight text-white drop-shadow">תיאוריה&nbsp;GO</h1>
+      <p class="text-white/90 text-lg md:text-xl">למידה ממוקדת, מבחן מדומה נאמן למציאות, וחזרתיות חכמה על טעויות. מינימלי, מהיר, מדויק.</p>
+      <div class="flex flex-wrap items-center justify-center gap-3 md:gap-4">
+        <button id="hero-start-study" class="btn-primary px-6 py-3 rounded-full font-bold shadow hover:translate-y-[-2px] active:translate-y-[0] transition">התחל/י למידה יומית</button>
+        <button id="hero-start-exam" class="btn-secondary px-6 py-3 rounded-full font-bold shadow hover:translate-y-[-2px] active:translate-y-[0] transition">מבחן מדומה</button>
       </div>
     </div>
   </section>
 
-  <!-- Header דביק וזכוכיתי -->
-  <header class="sticky top-0 z-40 bg-white/70 backdrop-blur border-b border-white/30 shadow-sm">
-    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
-      <div class="h-10 w-10 grid place-items-center rounded-2xl text-white text-lg shadow-glass" style="background: linear-gradient(135deg, #8B5FBF 0%, #6A4C93 50%, #7B68EE 100%);">🚗</div>
-      <div class="text-xl font-bold text-slate-800">תיאוריה GO</div>
+  <!-- Header -->
+  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-slate-200">
+    <div class="container max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
+      <div class="h-10 w-10 grid place-items-center rounded-2xl text-white text-lg" style="background: linear-gradient(135deg, #8B5FBF 0%, #6A4C93 50%, #7B68EE 100%);">🚗</div>
+      <div class="text-xl font-bold">תיאוריה GO</div>
       <div class="ms-auto flex items-center gap-2">
         <button id="btn-theme" class="px-3 py-1.5 text-sm rounded-xl border border-slate-300 bg-white/70 hover:bg-white transition" title="החלפת מצב תצוגה">מצב בהיר</button>
       </div>
     </div>
-    <nav class="max-w-5xl mx-auto px-4 pb-3">
+    <nav class="container max-w-5xl mx-auto px-4 pb-3">
       <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
-        <button data-view="home" class="tab-btn px-3 py-2 rounded-2xl bg-slate-900 text-white shadow hover:translate-y-[-1px] transition">בית</button>
-        <button data-view="study" class="tab-btn px-3 py-2 rounded-2xl bg-white/80 border border-slate-200 hover:bg-white transition">למידה</button>
-        <button data-view="exam" class="tab-btn px-3 py-2 rounded-2xl bg-white/80 border border-slate-200 hover:bg-white transition">מבחן מדומה</button>
-        <button data-view="signs" class="tab-btn px-3 py-2 rounded-2xl bg-white/80 border border-slate-200 hover:bg-white transition">תמרורים</button>
-        <button data-view="profile" class="tab-btn px-3 py-2 rounded-2xl bg-white/80 border border-slate-200 hover:bg-white transition">פרופיל</button>
+        <button data-view="home" class="tab-btn px-3 py-2 rounded-2xl bg-slate-900 text-white">בית</button>
+        <button data-view="study" class="tab-btn px-3 py-2 rounded-2xl bg-white border border-slate-200">למידה</button>
+        <button data-view="exam" class="tab-btn px-3 py-2 rounded-2xl bg-white border border-slate-200">מבחן מדומה</button>
+        <button data-view="signs" class="tab-btn px-3 py-2 rounded-2xl bg-white border border-slate-200">תמרורים</button>
+        <button data-view="profile" class="tab-btn px-3 py-2 rounded-2xl bg-white border border-slate-200">פרופיל</button>
       </div>
     </nav>
   </header>
 
-  <!-- Toast -->
-  <div id="toast" class="fixed top-3 left-3 sm:left-auto sm:right-3 z-50 hidden"></div>
+  <!-- Toast (aria-live) -->
+  <div id="toast" class="fixed top-3 left-3 sm:left-auto sm:right-3 z-50 hidden" aria-live="polite" role="status"></div>
 
-  <main class="max-w-5xl mx-auto px-4 py-10 space-y-10">
+  <main class="container max-w-5xl mx-auto px-4 py-10 space-y-10">
     <!-- HOME -->
     <section id="view-home" class="view grid md:grid-cols-2 gap-4">
-      <div class="p-5 rounded-2xl shadow bg-white/90 border border-slate-200 reveal">
-        <h2 class="text-lg font-semibold mb-1">ברוך/ה הבא/ה 👋</h2>
-        <p class="text-slate-600 mb-4">הצטרף/פי למסלול חכם להצלחה במבחן התיאוריה. אפשר להתחיל בלמידה יומית או לקפוץ ישר לסימולציה.</p>
+      <div class="p-5 bg-white rounded-2xl shadow-card border border-slate-100 reveal">
+        <h2 class="text-lg font-semibold mb-1">נתחיל מיד 👋</h2>
+        <p class="text-slate-600 mb-4">סשן קצר של 5 שאלות ביום, חזרה ממוקדת על טעויות, ובסוף סימולציה אמיתית.</p>
         <div class="flex flex-wrap gap-2">
-          <button id="cta-start-daily" class="px-4 py-2 rounded-2xl text-white shadow" style="background: linear-gradient(135deg, #8B5FBF 0%, #6A4C93 50%, #7B68EE 100%);">התחל/י למידה יומית</button>
-          <button id="cta-start-exam" class="px-4 py-2 rounded-2xl btn-gradient-gold">התחל/י מבחן מדומה</button>
+          <button id="cta-start-daily" class="px-4 py-2 rounded-2xl text-white" style="background: linear-gradient(135deg, #8B5FBF 0%, #6A4C93 50%, #7B68EE 100%);">התחל/י למידה יומית</button>
+          <button id="cta-start-exam" class="px-4 py-2 rounded-2xl btn-primary">התחל/י מבחן מדומה</button>
         </div>
       </div>
-      <div class="p-5 rounded-2xl shadow bg-white/90 border border-slate-200 reveal">
+      <div class="p-5 bg-white rounded-2xl shadow-card border border-slate-100 reveal">
         <h3 class="font-semibold mb-2">התקדמות</h3>
         <div class="flex items-end gap-6">
           <div>
@@ -152,47 +134,57 @@
           </div>
         </div>
       </div>
-
-      <!-- קופסת CTA בגרדיאנט עדין -->
-      <div class="md:col-span-2 rounded-2xl p-6 shadow section-soft-purple border border-slate-200 reveal">
-        <h3 class="text-slate-800 text-xl font-bold mb-2">לומדים חכם, מרגישים קמפיין</h3>
-        <p class="text-slate-600">כרטיסיות תמרורים, מבחן מדומה עם טיימר, וסטט׳ בזמן אמת. הכל בממשק רך, זמין, ונעים לעין.</p>
+      <div class="md:col-span-2 rounded-2xl p-6 section-soft border border-slate-200 reveal">
+        <h3 class="text-slate-800 text-xl font-bold mb-2">מצב ממוקד</h3>
+        <p class="text-slate-600">בזמן למידה הממשק נכנס ל־Focus Mode: פחות הסחות, מקשי קיצור, וקצב טבעי. אפשר לצאת בכל רגע.</p>
       </div>
     </section>
 
-    <!-- STUDY -->
+    <!-- STUDY (Focus Mode) -->
     <section id="view-study" class="view hidden">
-      <div class="p-5 rounded-2xl shadow bg-white/90 border border-slate-200 reveal">
+      <div class="p-5 bg-white rounded-2xl shadow-card border border-slate-100 reveal">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-semibold">למידה יומית – 5 שאלות</h2>
-          <div class="w-40 h-2 rounded-full bg-slate-200 overflow-hidden">
-            <div id="study-progress" class="h-full" style="background: linear-gradient(135deg, #8B5FBF 0%, #6A4C93 50%, #7B68EE 100%); width:0%"></div>
+          <div class="flex items-center gap-3 text-sm text-slate-600">
+            <span class="hidden md:inline">קיצורי מקלדת: 1–4 תשובה, N הבא, P הקודם, K דלג</span>
+            <div class="w-40 h-2 rounded-full bg-slate-200 overflow-hidden">
+              <div id="study-progress" class="h-full" style="background: linear-gradient(135deg, #8B5FBF 0%, #6A4C93 50%, #7B68EE 100%); width:0%"></div>
+            </div>
           </div>
         </div>
         <div id="study-card" class="space-y-3"></div>
+        <div class="mt-4 flex items-center justify-between">
+          <button id="study-skip" class="px-3 py-1.5 rounded-xl border">דלג</button>
+          <button id="study-exit" class="px-3 py-1.5 rounded-xl border">יציאה ממצב ממוקד</button>
+        </div>
       </div>
     </section>
 
     <!-- EXAM -->
     <section id="view-exam" class="view hidden">
-      <div class="p-5 rounded-2xl shadow bg-white/90 border border-slate-200 space-y-4 reveal">
+      <div class="p-5 bg-white rounded-2xl shadow-card border border-slate-100 space-y-4 reveal">
         <div class="flex items-center justify-between">
           <h2 class="text-lg font-semibold">מבחן מדומה</h2>
           <div class="flex items-center gap-3">
-            <div class="text-slate-600">⏱️ זמן נותר: <span id="exam-timer">—</span></div>
-            <button id="btn-start-exam" class="px-3 py-1.5 rounded-xl text-white shadow" style="background: linear-gradient(135deg, #4299E1 0%, #3182CE 100%);">התחל מבחן (30 שאלות)</button>
+            <div class="text-slate-600" aria-live="polite" role="status">⏱️ זמן נותר: <span id="exam-timer">—</span></div>
+            <button id="btn-start-exam" class="px-3 py-1.5 rounded-xl btn-secondary">התחל מבחן (30 שאלות)</button>
           </div>
         </div>
         <div id="exam-area" class="hidden">
-          <div id="exam-question" class="text-lg font-medium"></div>
+          <div class="flex items-center justify-between">
+            <div id="exam-question" class="text-lg font-medium"></div>
+            <button id="exam-mark" class="px-3 py-1.5 rounded-xl border" title="סמן לבדיקה (M)">סמן לבדיקה</button>
+          </div>
           <div id="exam-options" class="mt-3 grid gap-2"></div>
           <div class="flex items-center justify-between mt-4">
-            <button id="exam-prev" class="px-3 py-1.5 rounded-xl border">הקודם</button>
+            <button id="exam-prev" class="px-3 py-1.5 rounded-xl border">הקודם (P)</button>
             <div class="text-sm text-slate-600"><span id="exam-index">1</span>/<span id="exam-total">30</span></div>
-            <button id="exam-next" class="px-3 py-1.5 rounded-xl border">הבא</button>
+            <button id="exam-next" class="px-3 py-1.5 rounded-xl border">הבא (N)</button>
           </div>
-          <div class="flex items-center gap-2 mt-3">
-            <button id="exam-submit" class="px-4 py-2 rounded-2xl btn-gradient-gold">סיים מבחן</button>
+          <!-- מפת שאלות -->
+          <div id="exam-map" class="mt-4 grid grid-cols-10 sm:grid-cols-15 gap-1"></div>
+          <div class="flex items-center gap-2 mt-4">
+            <button id="exam-submit" class="px-4 py-2 rounded-2xl btn-primary">סיים מבחן (S)</button>
             <button id="exam-cancel" class="px-3 py-1.5 rounded-xl border">ביטול</button>
           </div>
         </div>
@@ -202,10 +194,10 @@
 
     <!-- SIGNS -->
     <section id="view-signs" class="view hidden">
-      <div class="p-5 rounded-2xl shadow bg-white/90 border border-slate-200 reveal">
+      <div class="p-5 bg-white rounded-2xl shadow-card border border-slate-100 reveal">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-semibold">כרטיסיות תמרורים</h2>
-          <div class="text-sm text-slate-600">סמן/י אם זכור, נלמד שוב את הלא‑זכורים</div>
+          <div class="text-sm text-slate-600">סמן/י אם זכור, נתרגל שוב את הלא־זכורים</div>
         </div>
         <div id="sign-card" class="space-y-3"></div>
       </div>
@@ -213,7 +205,7 @@
 
     <!-- PROFILE -->
     <section id="view-profile" class="view hidden">
-      <div class="p-5 rounded-2xl shadow bg-white/90 border border-slate-200 space-y-4 reveal">
+      <div class="p-5 bg-white rounded-2xl shadow-card border border-slate-100 space-y-4 reveal">
         <h2 class="text-lg font-semibold">פרופיל והתקדמות</h2>
         <div class="grid sm:grid-cols-3 gap-4">
           <div class="p-4 rounded-2xl border bg-slate-50">
@@ -237,8 +229,8 @@
     </section>
   </main>
 
-  <footer class="max-w-5xl mx-auto px-4 pb-10 text-center text-slate-500 text-sm reveal">
-    נבנה כקובץ יחיד לצורך MVP • תיאוריה GO ©
+  <footer class="container max-w-5xl mx-auto px-4 pb-10 text-center text-slate-500 text-sm reveal">
+    נבנה כ־MVP חד־עמודי • תיאוריה GO ©
   </footer>
 
   <script>
@@ -270,21 +262,16 @@
     const state = {
       view: 'home',
       study: { currentIndex: 0, total: 5, queue: [] },
-      exam: { running: false, index: 0, questions: [], answers: {}, timer: null, secondsLeft: 0 },
+      exam: { running: false, index: 0, questions: [], answers: {}, review: new Set(), timer: null, secondsLeft: 0 },
       stats: loadStats()
     };
 
-    // ====== עזרי LocalStorage ======
+    // ====== LocalStorage ======
     function loadStats(){
-      try{
-        const raw = localStorage.getItem('theoryStats');
-        if(raw){ return JSON.parse(raw); }
-      }catch(e){}
+      try{ const raw = localStorage.getItem('theoryStats'); if(raw){ return JSON.parse(raw); } }catch(e){}
       return { totalAnswered:0, correct:0, streak:0, lastPracticeDate:null, topics:{} };
     }
-    function saveStats(){
-      try{ localStorage.setItem('theoryStats', JSON.stringify(state.stats)); }catch(e){}
-    }
+    function saveStats(){ try{ localStorage.setItem('theoryStats', JSON.stringify(state.stats)); }catch(e){} }
     function updateStreakOnPractice(){
       const today = new Date();
       const d = today.toISOString().slice(0,10);
@@ -304,13 +291,14 @@
       document.getElementById('view-'+view).classList.remove('hidden');
       document.querySelectorAll('.tab-btn').forEach(btn=>{
         if(btn.dataset.view===view){
-          btn.classList.remove('bg-white/80','border','border-slate-200');
+          btn.classList.remove('bg-white','border','border-slate-200');
           btn.classList.add('bg-slate-900','text-white');
         } else {
-          btn.classList.add('bg-white/80','border','border-slate-200');
+          btn.classList.add('bg-white','border','border-slate-200');
           btn.classList.remove('bg-slate-900','text-white');
         }
       });
+      document.body.classList.toggle('focus-mode', view==='study');
       refreshDashboard();
       if(view==='study'){ startDailyStudy(); }
     }
@@ -318,285 +306,162 @@
     // ====== טוסטר ======
     function toast(msg){
       const el = document.getElementById('toast');
-      el.innerHTML = `<div class="px-4 py-2 rounded-xl shadow text-slate-900 bg-gradient-to-r from-yellow-300 to-amber-400">${msg}</div>`;
+      el.innerHTML = `<div class="px-4 py-2 rounded-xl shadow bg-gradient-to-r from-yellow-300 to-amber-400 text-slate-900">${msg}</div>`;
       el.classList.remove('hidden');
       setTimeout(()=> el.classList.add('hidden'), 1800);
     }
 
-    // ====== דשבורד ראשי/פרופיל ======
-    function accuracyPercent(){
-      const a = state.stats.totalAnswered || 0;
-      const c = state.stats.correct || 0;
-      return a ? Math.round((c/a)*100) : 0;
-    }
+    // ====== דשבורד ======
+    function accuracyPercent(){ const a = state.stats.totalAnswered||0, c = state.stats.correct||0; return a ? Math.round((c/a)*100) : 0; }
     function refreshDashboard(){
       const acc = accuracyPercent();
-      const el1 = document.getElementById('stat-correct-rate');
-      if(el1) el1.textContent = acc + '%';
-      const el2 = document.getElementById('stat-answered');
-      if(el2) el2.textContent = state.stats.totalAnswered;
-      const el3 = document.getElementById('stat-streak');
-      if(el3) el3.textContent = (state.stats.streak||0) + '🔥';
-      const el4 = document.getElementById('pf-accuracy');
-      if(el4) el4.textContent = acc + '%';
-      const el5 = document.getElementById('pf-answered');
-      if(el5) el5.textContent = state.stats.totalAnswered;
-      const el6 = document.getElementById('pf-streak');
-      if(el6) el6.textContent = (state.stats.streak||0) + '🔥';
-
+      const set = (id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=val; };
+      set('stat-correct-rate', acc+'%');
+      set('stat-answered', state.stats.totalAnswered);
+      set('stat-streak', (state.stats.streak||0)+'🔥');
+      set('pf-accuracy', acc+'%');
+      set('pf-answered', state.stats.totalAnswered);
+      set('pf-streak', (state.stats.streak||0)+'🔥');
       // topic stats
-      const wrap = document.getElementById('topic-stats');
-      if(!wrap) return;
-      wrap.innerHTML = '';
-      const topics = state.stats.topics || {};
-      const names = Object.keys(topics);
+      const wrap = document.getElementById('topic-stats'); if(!wrap) return; wrap.innerHTML='';
+      const topics = state.stats.topics || {}; const names = Object.keys(topics);
       if(!names.length){ wrap.innerHTML = '<div class="text-slate-500">אין עדיין נתונים לפי נושא.</div>'; return; }
       names.forEach(name=>{
-        const t = topics[name];
-        const pct = t.total ? Math.round((t.correct/t.total)*100) : 0;
-        const row = document.createElement('div');
-        row.className = 'flex items-center gap-3';
+        const t = topics[name]; const pct = t.total ? Math.round((t.correct/t.total)*100) : 0;
+        const row = document.createElement('div'); row.className = 'flex items-center gap-3';
         row.innerHTML = `<div class="w-28 text-sm text-slate-600">${name}</div>
           <div class="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden"><div class="h-full" style="background: linear-gradient(135deg, #8B5FBF 0%, #6A4C93 50%, #7B68EE 100%); width:${pct}%"></div></div>
-          <div class="w-10 text-end text-sm">${pct}%</div>`;
-        wrap.appendChild(row);
+          <div class="w-10 text-end text-sm">${pct}%</div>`; wrap.appendChild(row);
       });
     }
 
     function recordAnswer(topic, correct){
-      state.stats.totalAnswered += 1;
-      if(correct) state.stats.correct += 1;
+      state.stats.totalAnswered += 1; if(correct) state.stats.correct += 1;
       state.stats.topics[topic] = state.stats.topics[topic] || {correct:0,total:0};
-      state.stats.topics[topic].total += 1;
-      if(correct) state.stats.topics[topic].correct += 1;
-      saveStats();
+      state.stats.topics[topic].total += 1; if(correct) state.stats.topics[topic].correct += 1; saveStats();
     }
 
-    // ====== למידה יומית ======
+    // ====== למידה יומית (Focus Mode) ======
     function startDailyStudy(){
       state.study.currentIndex = 0;
-      // דגימה של 5 שאלות שונות
-      const pool = [...QUESTIONS];
-      const picked = [];
-      while(picked.length < Math.min(5, pool.length)){
-        const i = Math.floor(Math.random()*pool.length);
-        picked.push(pool.splice(i,1)[0]);
-      }
-      state.study.queue = picked;
-      updateStreakOnPractice();
-      renderStudyCard();
-      updateStudyProgress();
+      const pool = [...QUESTIONS]; const picked = [];
+      while(picked.length < Math.min(5, pool.length)){ const i = Math.floor(Math.random()*pool.length); picked.push(pool.splice(i,1)[0]); }
+      state.study.queue = picked; updateStreakOnPractice(); renderStudyCard(); updateStudyProgress();
     }
-    function updateStudyProgress(){
-      const pct = Math.round((state.study.currentIndex/state.study.queue.length)*100);
-      const bar = document.getElementById('study-progress');
-      if(bar) bar.style.width = pct + '%';
-    }
+    function updateStudyProgress(){ const pct = Math.round((state.study.currentIndex/state.study.queue.length)*100); const bar=document.getElementById('study-progress'); if(bar) bar.style.width = pct + '%'; }
     function renderStudyCard(){
-      const box = document.getElementById('study-card');
-      if(!box) return;
-      box.innerHTML = '';
-      const i = state.study.currentIndex;
-      if(i >= state.study.queue.length){
+      const box = document.getElementById('study-card'); if(!box) return; box.innerHTML = '';
+      const i = state.study.currentIndex; if(i >= state.study.queue.length){
         box.innerHTML = `<div class="text-center space-y-3">
           <div class="text-xl font-semibold">כל הכבוד! סיימת את הלמידה היומית 🎉</div>
-          <button class="px-4 py-2 rounded-2xl btn-gradient-gold" onclick="navigate('home')">חזרה לבית</button>
-        </div>`;
-        const bar = document.getElementById('study-progress');
-        if(bar) bar.style.width = '100%';
-        return;
-      }
+          <button class="px-4 py-2 rounded-2xl btn-primary" onclick="navigate('home')">חזרה לבית</button>
+        </div>`; const bar = document.getElementById('study-progress'); if(bar) bar.style.width='100%'; return; }
       const q = state.study.queue[i];
-      const qEl = document.createElement('div');
-      qEl.className = 'reveal in-view';
-      qEl.innerHTML = `<div class=\"text-slate-600 text-sm mb-1\">נושא: ${q.topic}</div>
-        <div class=\"text-lg font-medium\">${q.q}</div>`;
-      box.appendChild(qEl);
-
-      const opts = document.createElement('div');
-      opts.className = 'mt-3 grid gap-2';
-      q.options.forEach((txt,idx)=>{
-        const b = document.createElement('button');
-        b.className = 'px-3 py-2 rounded-xl border text-right hover:bg-slate-50 transition';
-        b.textContent = txt;
-        b.onclick = ()=>{
-          const isCorrect = idx === q.correct;
-          recordAnswer(q.topic, isCorrect);
-          // נעילת כפתורים
-          opts.querySelectorAll('button').forEach(x=>x.disabled=true);
-          b.classList.remove('border');
-          b.classList.add(isCorrect ? 'bg-green-100' : 'bg-red-100');
-          const exp = document.createElement('div');
-          exp.className = 'text-sm text-slate-600';
-          exp.textContent = isCorrect ? 'נכון! ממשיכים לשאלה הבאה.' : 'לא נורא, נשפר בשאלה הבאה.';
-          box.appendChild(exp);
-          setTimeout(()=>{ state.study.currentIndex++; updateStudyProgress(); renderStudyCard(); }, 650);
-        };
-        opts.appendChild(b);
-      });
+      const qEl = document.createElement('div'); qEl.className = 'reveal in-view';
+      qEl.innerHTML = `<div class=\"text-slate-600 text-sm mb-1\">נושא: ${q.topic}</div><div class=\"text-lg font-medium\">${q.q}</div>`; box.appendChild(qEl);
+      const opts = document.createElement('div'); opts.id='study-options'; opts.className = 'mt-3 grid gap-2';
+      q.options.forEach((txt,idx)=>{ const b = document.createElement('button'); b.className='px-3 py-2 rounded-xl border text-right hover:bg-slate-50 transition'; b.textContent=txt; b.dataset.idx=idx; b.onclick=()=>handleStudyAnswer(idx,q,opts,box); opts.appendChild(b); });
       box.appendChild(opts);
+    }
+    function handleStudyAnswer(idx,q,opts,box){
+      const isCorrect = idx===q.correct; recordAnswer(q.topic, isCorrect);
+      opts.querySelectorAll('button').forEach(x=>x.disabled=true);
+      const chosen = [...opts.children].find(b=>Number(b.dataset.idx)===idx); if(chosen){ chosen.classList.remove('border'); chosen.classList.add(isCorrect?'bg-green-100':'bg-red-100'); }
+      const exp = document.createElement('div'); exp.className='text-sm text-slate-600'; exp.textContent = isCorrect? 'נכון! ממשיכים לשאלה הבאה.' : 'לא נורא, נלמד מזה בשאלה הבאה.'; box.appendChild(exp);
+      setTimeout(()=>{ state.study.currentIndex++; updateStudyProgress(); renderStudyCard(); }, 550);
     }
 
     // ====== מבחן מדומה ======
     function startExam(){
-      state.exam.running = true;
-      state.exam.index = 0;
-      state.exam.answers = {};
-      // בחר 30 אקראיות (אם אין מספיק – חזרות בטוחות)
-      const arr = [];
-      for(let i=0;i<30;i++){
-        arr.push( QUESTIONS[Math.floor(Math.random()*QUESTIONS.length)] );
-      }
-      state.exam.questions = arr;
-      document.getElementById('exam-total').textContent = arr.length;
-      document.getElementById('exam-area').classList.remove('hidden');
-      document.getElementById('exam-result').classList.add('hidden');
-      document.getElementById('btn-start-exam').disabled = true;
-      // טיימר 20 דקות
-      state.exam.secondsLeft = 20*60;
-      updateExamTimer();
-      state.exam.timer = setInterval(()=>{
-        state.exam.secondsLeft--; updateExamTimer();
-        if(state.exam.secondsLeft<=0){ submitExam(); }
-      }, 1000);
-      renderExamQuestion();
+      state.exam.running = true; state.exam.index = 0; state.exam.answers = {}; state.exam.review.clear();
+      const arr = []; for(let i=0;i<30;i++){ arr.push( QUESTIONS[Math.floor(Math.random()*QUESTIONS.length)] ); }
+      state.exam.questions = arr; document.getElementById('exam-total').textContent = arr.length;
+      document.getElementById('exam-area').classList.remove('hidden'); document.getElementById('exam-result').classList.add('hidden'); document.getElementById('btn-start-exam').disabled = true;
+      state.exam.secondsLeft = 20*60; updateExamTimer(); state.exam.timer = setInterval(()=>{ state.exam.secondsLeft--; updateExamTimer(); if(state.exam.secondsLeft<=0){ submitExam(); } }, 1000);
+      renderExamQuestion(); renderExamMap();
     }
-    function updateExamTimer(){
-      const m = Math.floor(state.exam.secondsLeft/60);
-      const s = state.exam.secondsLeft%60;
-      document.getElementById('exam-timer').textContent = `${m}:${String(s).padStart(2,'0')}`;
-    }
-    function renderExamQuestion(){
-      const q = state.exam.questions[state.exam.index];
-      document.getElementById('exam-index').textContent = (state.exam.index+1);
-      const qEl = document.getElementById('exam-question');
-      qEl.textContent = q.q;
-      const opts = document.getElementById('exam-options');
-      opts.innerHTML = '';
-      q.options.forEach((txt,idx)=>{
-        const lbl = document.createElement('label');
-        lbl.className = 'flex items-center gap-2 p-2 rounded-xl border hover:bg-slate-50 cursor-pointer transition';
-        const inp = document.createElement('input');
-        inp.type = 'radio';
-        inp.name = 'exam-opt';
-        inp.checked = state.exam.answers[q.id] === idx;
-        inp.onchange = ()=>{ state.exam.answers[q.id] = idx; };
-        const span = document.createElement('span');
-        span.textContent = txt;
-        lbl.appendChild(inp); lbl.appendChild(span); opts.appendChild(lbl);
-      });
-      document.getElementById('exam-prev').disabled = state.exam.index===0;
-      document.getElementById('exam-next').disabled = state.exam.index===(state.exam.questions.length-1);
-    }
-    function submitExam(){
-      if(state.exam.timer){ clearInterval(state.exam.timer); state.exam.timer=null; }
-      let correct=0;
-      state.exam.questions.forEach(q=>{
-        const ans = state.exam.answers[q.id];
-        const ok = (ans===q.correct);
-        if(ok){ correct++; }
-        recordAnswer(q.topic, !!ok);
-      });
-      const total = state.exam.questions.length;
-      const percent = Math.round((correct/total)*100);
-      const pass = percent >= 80; // רף הצלחה לדוגמה
-      const box = document.getElementById('exam-result');
-      box.classList.remove('hidden');
-      document.getElementById('exam-area').classList.add('hidden');
-      document.getElementById('btn-start-exam').disabled = false;
-      box.innerHTML = `<div class="p-4 rounded-2xl border ${pass?'bg-green-50':'bg-red-50'}">
+    function updateExamTimer(){ const m = Math.floor(state.exam.secondsLeft/60); const s = state.exam.secondsLeft%60; document.getElementById('exam-timer').textContent = `${m}:${String(s).padStart(2,'0')}`; }
+    function renderExamQuestion(){ const q = state.exam.questions[state.exam.index]; document.getElementById('exam-index').textContent = (state.exam.index+1); document.getElementById('exam-question').textContent = q.q; const opts = document.getElementById('exam-options'); opts.innerHTML=''; q.options.forEach((txt,idx)=>{ const lbl=document.createElement('label'); lbl.className='flex items-center gap-2 p-2 rounded-xl border hover:bg-slate-50 cursor-pointer transition'; const inp=document.createElement('input'); inp.type='radio'; inp.name='exam-opt'; inp.checked = state.exam.answers[q.id]===idx; inp.onchange = ()=>{ state.exam.answers[q.id]=idx; renderExamMap(); }; const span=document.createElement('span'); span.textContent=txt; lbl.appendChild(inp); lbl.appendChild(span); opts.appendChild(lbl); }); document.getElementById('exam-prev').disabled = state.exam.index===0; document.getElementById('exam-next').disabled = state.exam.index===(state.exam.questions.length-1); updateMarkButton(); }
+    function updateMarkButton(){ const q = state.exam.questions[state.exam.index]; const marked = state.exam.review.has(q.id); const btn = document.getElementById('exam-mark'); btn.textContent = marked? 'הסר סימון' : 'סמן לבדיקה'; }
+    function toggleMark(){ const q = state.exam.questions[state.exam.index]; if(state.exam.review.has(q.id)) state.exam.review.delete(q.id); else state.exam.review.add(q.id); updateMarkButton(); renderExamMap(); }
+    function renderExamMap(){ const wrap = document.getElementById('exam-map'); wrap.innerHTML=''; state.exam.questions.forEach((q,i)=>{ const ansIdx = state.exam.answers[q.id]; const marked = state.exam.review.has(q.id); const b = document.createElement('button'); b.className = 'h-8 text-xs rounded-lg border flex items-center justify-center'; b.title = `שאלה ${i+1}`; b.setAttribute('aria-label', `שאלה ${i+1}${marked? ', מסומן לבדיקה':''}${ansIdx!=null? ', נענתה':''}`);
+        if(i===state.exam.index){ b.classList.add('border-slate-900'); }
+        if(marked){ b.classList.add('bg-amber-100','border-amber-300'); }
+        else if(ansIdx!=null){ b.classList.add('bg-slate-100'); }
+        b.textContent = i+1; b.onclick = ()=>{ state.exam.index = i; renderExamQuestion(); renderExamMap(); }; wrap.appendChild(b); }); }
+    function submitExam(){ if(state.exam.timer){ clearInterval(state.exam.timer); state.exam.timer=null; } let correct=0; state.exam.questions.forEach(q=>{ const ans = state.exam.answers[q.id]; const ok = (ans===q.correct); if(ok){ correct++; } recordAnswer(q.topic, !!ok); }); const total = state.exam.questions.length; const percent = Math.round((correct/total)*100); const pass = percent >= 80; const box = document.getElementById('exam-result'); box.classList.remove('hidden'); document.getElementById('exam-area').classList.add('hidden'); document.getElementById('btn-start-exam').disabled = false; box.innerHTML = `<div class="p-4 rounded-2xl border ${pass?'bg-green-50':'bg-red-50'}">
         <div class="text-lg font-semibold mb-1">תוצאה: ${correct}/${total} (${percent}%)</div>
-        <div class="text-slate-700 mb-3">${pass? 'מעולה! נראה שאתה/את בכיוון הנכון ✅' : 'יש עוד מה לשפר – ממליץ/ה לעבוד על נקודות החולשה.'}</div>
-        <button class="px-4 py-2 rounded-2xl text-white shadow" style="background: linear-gradient(135deg, #8B5FBF 0%, #6A4C93 50%, #7B68EE 100%);" onclick="startExam()">נסה/י שוב</button>
-      </div>`;
-      refreshDashboard();
-      toast('המבחן הסתיים – התוצאה נשמרה');
-    }
+        <div class="text-slate-700 mb-3">${pass? 'מעולה! נראה שאתה/את בכיוון הנכון ✅' : 'יש עוד מה לשפר – נעבוד ממוקד על נקודות החולשה.'}</div>
+        <button class="px-4 py-2 rounded-2xl btn-secondary" onclick="startExam()">נסה/י שוב</button>
+      </div>`; refreshDashboard(); toast('המבחן הסתיים – התוצאה נשמרה'); }
 
     // ====== כרטיסיות תמרורים ======
     const flash = { order: [], index: 0, queue: [] };
-    function startSigns(){
-      flash.order = [...SIGNS];
-      flash.index = 0;
-      flash.queue = [];
-      renderSignCard();
-    }
-    function renderSignCard(){
-      const box = document.getElementById('sign-card');
-      box.innerHTML = '';
-      if(flash.index >= flash.order.length){
-        if(flash.queue.length){
-          flash.order = [...flash.queue]; flash.queue = []; flash.index = 0;
-        } else {
-          box.innerHTML = `<div class="text-center space-y-2">
-            <div class="text-xl font-semibold">יפה! שלטתם בתמרורים שבסט זה 🎉</div>
-            <button class="px-4 py-2 rounded-2xl text-white shadow" style=\"background: linear-gradient(135deg, #4299E1 0%, #3182CE 100%);\" onclick=\"startSigns()\">סיבוב נוסף</button>
-          </div>`; return;
-        }
-      }
-      const s = flash.order[flash.index];
-      const card = document.createElement('div');
-      card.className = 'p-4 rounded-2xl border bg-slate-50 reveal in-view';
-      card.innerHTML = `<div class="text-4xl mb-2">🚧</div>
-        <div class="text-lg font-semibold">${s.name}</div>
-        <div class="text-slate-700">${s.desc}</div>`;
-      box.appendChild(card);
-      const actions = document.createElement('div');
-      actions.className = 'flex gap-2 mt-3';
-      const known = document.createElement('button'); known.className = 'px-3 py-1.5 rounded-xl border'; known.textContent = 'זכור לי';
-      const unknown = document.createElement('button'); unknown.className = 'px-3 py-1.5 rounded-xl btn-gradient-gold'; unknown.textContent = 'לא זכור';
-      known.onclick = ()=>{ flash.index++; renderSignCard(); };
-      unknown.onclick = ()=>{ flash.queue.push(s); flash.index++; renderSignCard(); };
-      actions.appendChild(known); actions.appendChild(unknown); box.appendChild(actions);
-    }
+    function startSigns(){ flash.order = [...SIGNS]; flash.index = 0; flash.queue = []; renderSignCard(); }
+    function renderSignCard(){ const box = document.getElementById('sign-card'); box.innerHTML = ''; if(flash.index >= flash.order.length){ if(flash.queue.length){ flash.order = [...flash.queue]; flash.queue = []; flash.index = 0; } else { box.innerHTML = `<div class="text-center space-y-2"><div class="text-xl font-semibold">יפה! שלטתם בתמרורים שבסט זה 🎉</div><button class="px-4 py-2 rounded-2xl btn-secondary" onclick="startSigns()">סיבוב נוסף</button></div>`; return; } }
+      const s = flash.order[flash.index]; const card = document.createElement('div'); card.className='p-4 rounded-2xl border bg-slate-50 reveal in-view'; card.innerHTML = `<div class="text-4xl mb-2">🚧</div><div class="text-lg font-semibold">${s.name}</div><div class="text-slate-700">${s.desc}</div>`; box.appendChild(card);
+      const actions = document.createElement('div'); actions.className='flex gap-2 mt-3'; const known=document.createElement('button'); known.className='px-3 py-1.5 rounded-xl border'; known.textContent='זכור לי'; const unknown=document.createElement('button'); unknown.className='px-3 py-1.5 rounded-xl btn-primary'; unknown.textContent='לא זכור'; known.onclick=()=>{ flash.index++; renderSignCard(); }; unknown.onclick=()=>{ flash.queue.push(s); flash.index++; renderSignCard(); }; actions.appendChild(known); actions.appendChild(unknown); box.appendChild(actions); }
 
-    // ====== Theme Toggle (קל/כהה – בסיסי) ======
+    // ====== Theme Toggle ======
     const themeBtn = document.getElementById('btn-theme');
-    function applyTheme(){
-      const dark = localStorage.getItem('themeDark')==='1';
-      document.documentElement.classList.toggle('dark', dark);
-      document.body.classList.toggle('bg-slate-900', dark);
-      document.body.classList.toggle('text-slate-100', dark);
-      themeBtn.textContent = dark? 'מצב כהה' : 'מצב בהיר';
-    }
+    function applyTheme(){ const dark = localStorage.getItem('themeDark')==='1'; document.documentElement.classList.toggle('dark', dark); document.body.classList.toggle('bg-slate-900', dark); document.body.classList.toggle('text-slate-100', dark); themeBtn.textContent = dark? 'מצב כהה' : 'מצב בהיר'; }
 
-    // ====== ריוול-און-סק롤 ======
-    function setupReveal(){
-      const observer = new IntersectionObserver((entries)=>{
-        entries.forEach(e=>{
-          if(e.isIntersecting){ e.target.classList.add('in-view'); observer.unobserve(e.target); }
-        })
-      }, { threshold: 0.12 });
-      document.querySelectorAll('.reveal').forEach(el=> observer.observe(el));
+    // ====== Reveal-on-scroll ======
+    function setupReveal(){ const observer = new IntersectionObserver((entries)=>{ entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in-view'); observer.unobserve(e.target); } }) }, { threshold: 0.14 }); document.querySelectorAll('.reveal').forEach(el=> observer.observe(el)); }
+
+    // ====== קיצורי מקלדת ======
+    function onKey(e){
+      const key = e.key.toLowerCase();
+      // בלמידה
+      if(state.view==='study'){
+        const opts = document.getElementById('study-options');
+        if(['1','2','3','4'].includes(key) && opts){ const i = Number(key)-1; const btn = opts.children[i]; if(btn){ btn.click(); }}
+        if(key==='n'){ // אין "הבא" אם לא ענינו; מאפשר דילוג
+          document.getElementById('study-skip')?.click();
+        }
+        if(key==='k'){ document.getElementById('study-skip')?.click(); }
+      }
+      // במבחן
+      if(state.view==='exam' && state.exam.running){
+        if(['1','2','3','4'].includes(key)){
+          const idx = Number(key)-1; const q = state.exam.questions[state.exam.index]; if(q){ state.exam.answers[q.id]=idx; renderExamQuestion(); renderExamMap(); }
+        }
+        if(key==='n'){ if(state.exam.index < state.exam.questions.length-1){ state.exam.index++; renderExamQuestion(); renderExamMap(); }}
+        if(key==='p'){ if(state.exam.index>0){ state.exam.index--; renderExamQuestion(); renderExamMap(); }}
+        if(key==='m'){ toggleMark(); }
+        if(key==='s'){ submitExam(); }
+      }
     }
 
     // ====== חיבור אירועים ======
     function wire(){
-      // כפתורי הירו
-      const hs = document.getElementById('hero-start-study'); if(hs) hs.addEventListener('click', ()=>{ navigate('study'); toast('טוב, מתחילים בלמידה יומית!'); });
-      const he = document.getElementById('hero-start-exam'); if(he) he.addEventListener('click', ()=>{ navigate('exam'); startExam(); });
+      // הירו
+      document.getElementById('hero-start-study').addEventListener('click', ()=>{ navigate('study'); toast('מתחילים בלמידה יומית'); });
+      document.getElementById('hero-start-exam').addEventListener('click', ()=>{ navigate('exam'); startExam(); });
       // טאבים
       document.querySelectorAll('.tab-btn').forEach(b=> b.addEventListener('click', ()=> navigate(b.dataset.view)));
       document.getElementById('cta-start-daily').addEventListener('click', ()=>{ navigate('study'); toast('טוב, מתחילים בלמידה יומית!'); });
       document.getElementById('cta-start-exam').addEventListener('click', ()=>{ navigate('exam'); startExam(); });
+      // למידה
+      document.getElementById('study-skip').addEventListener('click', ()=>{ state.study.currentIndex++; updateStudyProgress(); renderStudyCard(); });
+      document.getElementById('study-exit').addEventListener('click', ()=> navigate('home'));
+      // מבחן
       document.getElementById('btn-start-exam').addEventListener('click', startExam);
-      document.getElementById('exam-prev').addEventListener('click', ()=>{ if(state.exam.index>0){ state.exam.index--; renderExamQuestion(); }});
-      document.getElementById('exam-next').addEventListener('click', ()=>{ if(state.exam.index < state.exam.questions.length-1){ state.exam.index++; renderExamQuestion(); }});
+      document.getElementById('exam-prev').addEventListener('click', ()=>{ if(state.exam.index>0){ state.exam.index--; renderExamQuestion(); renderExamMap(); }});
+      document.getElementById('exam-next').addEventListener('click', ()=>{ if(state.exam.index < state.exam.questions.length-1){ state.exam.index++; renderExamQuestion(); renderExamMap(); }});
       document.getElementById('exam-submit').addEventListener('click', submitExam);
-      document.getElementById('exam-cancel').addEventListener('click', ()=>{ if(state.exam.timer){ clearInterval(state.exam.timer); state.exam.timer=null; } document.getElementById('exam-area').classList.add('hidden'); document.getElementById('btn-start-exam').disabled=false; document.getElementById('exam-result').classList.add('hidden'); });
+      document.getElementById('exam-cancel').addEventListener('click', ()=>{ if(state.exam.timer){ clearInterval(state.exam.timer); state.exam.timer=null; } document.getElementById('exam-area').classList.add('hidden'); document.getElementById('btn-start-exam').disabled=false; document.getElementById('exam-result').classList.add('hidden'); state.exam.running=false; });
+      document.getElementById('exam-mark').addEventListener('click', toggleMark);
+      // תמרורים
       document.querySelector('[data-view="signs"]').addEventListener('click', startSigns);
-      themeBtn.addEventListener('click', ()=>{ const v = localStorage.getItem('themeDark')==='1'; localStorage.setItem('themeDark', v?'0':'1'); applyTheme(); });
+      // Theme
+      const themeBtn = document.getElementById('btn-theme'); themeBtn.addEventListener('click', ()=>{ const v = localStorage.getItem('themeDark')==='1'; localStorage.setItem('themeDark', v?'0':'1'); applyTheme(); });
+      // Keyboard
+      document.addEventListener('keydown', onKey);
     }
 
     // ====== אתחול ======
-    function init(){
-      applyTheme();
-      wire();
-      setupReveal();
-      navigate('home');
-    }
-
-    // הרצה
+    function init(){ applyTheme(); wire(); setupReveal(); navigate('home'); }
     window.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
